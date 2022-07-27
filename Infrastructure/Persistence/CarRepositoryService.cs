@@ -16,6 +16,7 @@ public class CarRepositoryService : ICarRepositoryService
     public async Task Add(CarEntity carEntity, CancellationToken cancellationToken)
     {
         await _applicationDb.Cars.AddAsync(carEntity, cancellationToken);
+        await _applicationDb.SaveChangesAsync(cancellationToken);
     }
 
     public async Task Remove(Guid carId, CancellationToken cancellationToken)
@@ -27,6 +28,7 @@ public class CarRepositoryService : ICarRepositoryService
             throw new NullReferenceException($"I haven't found car (id:'{carId}'");
 
         _applicationDb.Cars.Remove(findCar);
+        await _applicationDb.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<CarEntity>> GetCars(CancellationToken cancellationToken)

@@ -1,10 +1,14 @@
+using Application;
+using Application.Dto;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
@@ -16,9 +20,18 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UsePersistenceConfiguration();
 
-app.MapPost("Test", () =>
+app.MapPost("Test", async (
+    [FromForm] CarDto carDto,
+    [FromServices] ICarService car, 
+    CancellationToken cancellationToken) =>
 {
-    return " --- post ---";
+    var result = await car.Add(
+        carDto.Name,
+        carDto.Brand,
+        carDto.Horsepower,
+        carDto.EngineCapacity,
+        cancellationToken);
+    return $" --- post --- {result}";
 });
 app.MapGet("Test", () =>
 {
