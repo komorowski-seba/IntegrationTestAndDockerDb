@@ -23,13 +23,14 @@ public class CarService : ICarService
         return newCar.Id;
     }
 
-    public async Task<bool> Remove(CancellationToken cancellationToken)
+    public async Task<bool> Remove(Guid carId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await _carRepository.Remove(carId, cancellationToken);
+        return true;
     }
 
-    public async Task<IEnumerable<CarEntity>> GetAll(CancellationToken cancellationToken)
+    public Task<IEnumerable<CarEntity>> GetAll(CancellationToken cancellationToken)
     {
-        return Enumerable.Empty<CarEntity>();
+        return _carRepository.GetCars(cancellationToken);
     }
 }

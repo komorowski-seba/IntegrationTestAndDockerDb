@@ -20,26 +20,31 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UsePersistenceConfiguration();
 
-app.MapPost("Test", async (
+app.MapPost("Car", async (
     [FromForm] CarDto carDto,
-    [FromServices] ICarService car, 
+    [FromServices] ICarService carService, 
     CancellationToken cancellationToken) =>
 {
-    var result = await car.Add(
+    var result = await carService.Add(
         carDto.Name,
         carDto.Brand,
         carDto.Horsepower,
         carDto.EngineCapacity,
         cancellationToken);
-    return $" --- post --- {result}";
+    return $" Added new car: '{result}'";
 });
-app.MapGet("Test", () =>
+app.MapGet("Cars", async ([FromServices] ICarService carService, CancellationToken cancellationToken) =>
 {
-    return "-- Test --";
+    var result = await carService.GetAll(cancellationToken);
+    return result;
 });
-app.MapDelete("Test", () =>
+app.MapDelete("Car", async (
+    [FromBody] Guid carId,
+    [FromServices] ICarService carService,
+    CancellationToken cancellationToken) =>
 {
-    return " --- delete ---";
+    var resutl = await carService.Remove(carId, cancellationToken);
+    return resutl;
 });
 
 app.Run();

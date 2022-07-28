@@ -10,6 +10,6 @@ public interface ICarService
         int horsepower,
         double engineCapacity,
         CancellationToken cancellationToken);
-    public Task<bool> Remove(CancellationToken cancellationToken);
+    public Task<bool> Remove(Guid carId, CancellationToken cancellationToken);
     public Task<IEnumerable<CarEntity>> GetAll(CancellationToken cancellationToken);
 }
