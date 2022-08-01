@@ -20,7 +20,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UsePersistenceConfiguration();
 
-app.MapPost("Car", async (
+app.MapPost("api/car", async (
     [FromForm] CarDto carDto,
     [FromServices] ICarService carService, 
     CancellationToken cancellationToken) =>
@@ -33,12 +33,12 @@ app.MapPost("Car", async (
         cancellationToken);
     return $" Added new car: '{result}'";
 });
-app.MapGet("Cars", async ([FromServices] ICarService carService, CancellationToken cancellationToken) =>
+app.MapGet("api/cars", async ([FromServices] ICarService carService, CancellationToken cancellationToken) =>
 {
     var result = await carService.GetAll(cancellationToken);
     return result;
 });
-app.MapDelete("Car", async (
+app.MapDelete("api/car", async (
     [FromBody] Guid carId,
     [FromServices] ICarService carService,
     CancellationToken cancellationToken) =>
@@ -48,3 +48,5 @@ app.MapDelete("Car", async (
 });
 
 app.Run();
+
+public partial class Program { }
