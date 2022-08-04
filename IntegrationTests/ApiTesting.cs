@@ -1,38 +1,45 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Application.Dto;
+using Application.Entities;
+using FluentAssertions;
 using Xunit;
 
 namespace IntegrationTests;
 
-public class ApiTesting : IClassFixture<WebApplicationFactory<Program>>, IClassFixture<MsDbFixture>
+public class ApiTesting : IClassFixture<AppDbFixture<Program>>
 {
-    private readonly WebApplicationFactory<Program> _webFactory;
-    private readonly MsDbFixture _dbFactory;
+    private readonly AppDbFixture<Program> _dbFixture;
 
-    public ApiTesting(WebApplicationFactory<Program> webFactory, MsDbFixture dbFactory)
+    public ApiTesting(AppDbFixture<Program> dbFixture)
     {
-        _webFactory = webFactory;
-        _dbFactory = dbFactory;
+        _dbFixture = dbFixture;
     }
 
     [Fact]
-    public async Task AddTest()
+    public async Task AddAndGet_Success()
     {
-        var client = _webFactory.CreateClient();
-        var i = await client.GetAsync("api/cars");
-        var c = await i.Content.ReadAsStringAsync(CancellationToken.None);
-    }
-
-    [Fact]
-    public async Task XyzTest()
-    {
-        // var container = new ContainerBuilder<MsSqlContainer>()
-        //     .ConfigureDatabaseConfiguration("not-important", "not-important", "not-important")
-        //     .Build();
-        //
-        // var actual = container.DockerImageName;
-        //
-        // var i = actual.Length;
+        var client = _dbFixture.CreateClient();
+        var carContent = new CarDto
+        {
+            Name = "abc",
+            Brand = "xyz",
+            Horsepower = 100,
+            EngineCapacity = 1.2
+        };
+        
+        // act
+        var responseAdd = await client.PostAsJsonAsync("api/car", carContent);
+        var addedCarId = await responseAdd.Content.ReadAsStringAsync(CancellationToken.None);
+        var resultAllCars = await client.GetFromJsonAsync<List<CarEntity>>("api/cars");
+        
+        // assert
+        resultAllCars.Should()
+            .NotBeNull()
+            .And.NotBeEmpty()
+            .And.ContainSingle(n => n.Id.ToString().Equals(addedCarId));
     }
 }

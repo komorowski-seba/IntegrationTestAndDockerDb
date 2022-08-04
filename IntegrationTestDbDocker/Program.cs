@@ -31,7 +31,7 @@ app.MapPost("api/car", async (
         carDto.Horsepower,
         carDto.EngineCapacity,
         cancellationToken);
-    return $" Added new car: '{result}'";
+    return result.ToString();
 });
 app.MapGet("api/cars", async ([FromServices] ICarService carService, CancellationToken cancellationToken) =>
 {
