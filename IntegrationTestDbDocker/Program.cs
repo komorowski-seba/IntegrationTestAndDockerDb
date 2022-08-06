@@ -38,8 +38,8 @@ app.MapGet("api/cars", async ([FromServices] ICarService carService, Cancellatio
     var result = await carService.GetAll(cancellationToken);
     return result;
 });
-app.MapDelete("api/car", async (
-    [FromBody] Guid carId,
+app.MapDelete("api/car{carId}", async (
+    Guid carId,
     [FromServices] ICarService carService,
     CancellationToken cancellationToken) =>
 {

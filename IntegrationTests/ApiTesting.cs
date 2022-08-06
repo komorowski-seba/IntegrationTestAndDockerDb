@@ -34,6 +34,7 @@ public class ApiTesting : IClassFixture<AppDbFixture<Program>>
         // act
         var responseAdd = await client.PostAsJsonAsync("api/car", carContent);
         var addedCarId = await responseAdd.Content.ReadAsStringAsync(CancellationToken.None);
+        
         var resultAllCars = await client.GetFromJsonAsync<List<CarEntity>>("api/cars");
         
         // assert
@@ -41,5 +42,28 @@ public class ApiTesting : IClassFixture<AppDbFixture<Program>>
             .NotBeNull()
             .And.NotBeEmpty()
             .And.ContainSingle(n => n.Id.ToString().Equals(addedCarId));
+    }
+
+    [Fact]
+    public async Task AddAndRemove_Success()
+    {
+        var client = _dbFixture.CreateClient();
+        var carContent = new CarDto
+        {
+            Name = "123",
+            Brand = "ccc",
+            Horsepower = 100,
+            EngineCapacity = 1.2
+        };
+        
+        // act
+        var responseAdd = await client.PostAsJsonAsync("api/car", carContent);
+        var addedCarId = await responseAdd.Content.ReadAsStringAsync(CancellationToken.None);
+        
+        var responseDel = await client.DeleteAsync($"api/car{addedCarId}");
+        var resultDel = await responseDel.Content.ReadAsStringAsync(CancellationToken.None);
+        
+        // assert
+        resultDel.Should().Be("true");
     }
 }
